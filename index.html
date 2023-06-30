@@ -1,4 +1,34 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>Table of Contents.md</title><style></style></head><body id="preview">
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+    }
+
+    ol {
+      padding-left: 20px;
+    }
+
+    ol li {
+      margin-bottom: 10px;
+    }
+
+    img {
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body id="preview">
 <h1 class="code-line" data-line-start="0" data-line-end="1"><a id="Quarto_Report_Analysis_of_COVID19_Pandemic_in_Ireland_and_Other_Countries_0"></a>Quarto Report: Analysis of COVID-19 Pandemic in Ireland and Other Countries</h1>
 <p class="has-line-data" data-line-start="2" data-line-end="3"><strong>Author: Manan Sood</strong></p>
 <p class="has-line-data" data-line-start="4" data-line-end="5"><strong>Publish Date: June 18, 2023</strong></p>
@@ -7,20 +37,10 @@
 <li class="has-line-data" data-line-start="8" data-line-end="9"><a href="#introduction">Introduction</a></li>
 <li class="has-line-data" data-line-start="9" data-line-end="12"><a href="#visualization-1-covid-19-regions-on-world-map">Visualization 1: COVID-19 Regions on World Map</a><br>
 2.1 Overview and Result<br>
-2.2 Code Snippet</li>
-<li class="has-line-data" data-line-start="12" data-line-end="15"><a href="#visualization-2-covid-19-total-cases-by-country">Visualization 2: COVID-19 Total Cases by Country</a><br>
 3.1 Overview and Result<br>
-3.2 Code Snippet</li>
-<li class="has-line-data" data-line-start="15" data-line-end="18"><a href="#visualization-3-covid-19-total-deaths-vs-total-cases">Visualization 3: COVID-19 Total Deaths vs Total Cases</a><br>
 4.1 Overview and Result<br>
-4.2 Code Snippet</li>
-<li class="has-line-data" data-line-start="18" data-line-end="21"><a href="#visualization-4-covid-19-total-cases-over-time">Visualization 4: COVID-19 Total Cases Over Time</a><br>
 5.1 Overview and Result<br>
-5.2 Code Snippet</li>
-<li class="has-line-data" data-line-start="21" data-line-end="24"><a href="#visualization-5-time-series-chart-of-covid-19-total-cases-by-country">Visualization 5: Time Series Chart of COVID-19 Total Cases by Country</a><br>
 6.1 Overview and Result<br>
-6.2 Code Snippet</li>
-<li class="has-line-data" data-line-start="24" data-line-end="26"><a href="#conclusion">Conclusion</a></li>
 </ol>
 <h2 class="code-line" data-line-start="26" data-line-end="27"><a id="1_Introduction_26"></a>1. Introduction</h2>
 <p class="has-line-data" data-line-start="28" data-line-end="29">Leo Varadkar, the current Irish Taoiseach, has recruited you for the National Public Health Emergency Team (NPHET) to analyze the data related to the COVID-19 pandemic. NPHET has asked you to analyze the situation of Ireland and nine other countries regarding the COVID-19 pandemic. In this report, we will explore visualizations and insights based on the provided data.</p>
@@ -28,114 +48,18 @@
 <h3 class="code-line" data-line-start="32" data-line-end="33"><a id="21_Overview_and_Result_32"></a>2.1 Overview and Result</h3>
 <p class="has-line-data" data-line-start="33" data-line-end="35">This visualization displays COVID-19 regions on a world map. The regions are represented by different colors, providing a visual representation of the pandemic’s spread across different countries.<br>
 <img src="https://i.imgur.com/IOgZysH.png" alt="Imgur"></p>
-<h3 class="code-line" data-line-start="35" data-line-end="36"><a id="22_Code_Snippet_35"></a>2.2 Code Snippet</h3>
-<pre><code class="has-line-data" data-line-start="37" data-line-end="74" class="language-python">library(ggplot2)
-library(dplyr)
-library(sf)
-
-<span class="hljs-comment"># Read the country_data.csv file</span>
-data &lt;- read.csv(<span class="hljs-string">"country_data.csv"</span>, stringsAsFactors = FALSE)
-
-<span class="hljs-comment"># Clean and transform the data</span>
-clean_data &lt;- data %&gt;%
-  filter(!<span class="hljs-keyword">is</span>.na(total_cases), total_cases &gt;= <span class="hljs-number">0</span>)
-
-<span class="hljs-comment"># Filter for the top 9 countries with the highest total_cases</span>
-top_9 &lt;- clean_data %&gt;%
-  group_by(location) %&gt;%
-  summarize(total_cases = sum(total_cases)) %&gt;%
-  arrange(desc(total_cases)) %&gt;%
-  head(<span class="hljs-number">9</span>) %&gt;%
-  pull(location)
-
-clean_data &lt;- clean_data %&gt;%
-  filter(location %<span class="hljs-keyword">in</span>% top_9)
-
-<span class="hljs-comment"># Load World Map dataset</span>
-world_map &lt;- st_read(system.file(<span class="hljs-string">"shape/nc.shp"</span>, package = <span class="hljs-string">"sf"</span>), quiet = TRUE)
-
-<span class="hljs-comment"># Merge world_map and clean_data based on country name</span>
-merged_data &lt;- merge(world_map, clean_data, by.x = <span class="hljs-string">"name"</span>, by.y = <span class="hljs-string">"location"</span>)
-
-<span class="hljs-comment"># Plot the world map with regions</span>
-ggplot() +
-  geom_sf(data = world_map, color = <span class="hljs-string">"white"</span>, fill = <span class="hljs-string">"lightgray"</span>) +
-  geom_sf(data = merged_data, aes(fill = location), color = <span class="hljs-string">"0.8"</span>, size = <span class="hljs-number">0.8</span>) +
-  scale_fill_brewer(palette = <span class="hljs-string">"Set3"</span>) +
-  labs(title = <span class="hljs-string">"COVID-19 Regions on World Map"</span>) +
-  theme_minimal()
-
-</code></pre>
 <h2 class="code-line" data-line-start="75" data-line-end="76"><a id="3_Visualization_2_COVID19_Total_Cases_by_Country_75"></a>3. Visualization 2: COVID-19 Total Cases by Country</h2>
 <h3 class="code-line" data-line-start="77" data-line-end="78"><a id="31_Overview_and_Result_77"></a>3.1 Overview and Result</h3>
 <p class="has-line-data" data-line-start="78" data-line-end="80">This visualization displays COVID-19 regions on a world map. The regions are represented by different colors, providing a visual representation of the pandemic’s spread across different countries.<br>
 <img src="https://i.imgur.com/04t97aq.png" alt="Imgur"></p>
-<h3 class="code-line" data-line-start="80" data-line-end="81"><a id="32_Code_Snippet_80"></a>3.2 Code Snippet</h3>
-<pre><code class="has-line-data" data-line-start="82" data-line-end="98" class="language-R"><span class="hljs-keyword">library</span>(ggplot2)
-
-<span class="hljs-comment"># Read the country_data.csv file</span>
-data &lt;- read.csv(<span class="hljs-string">"country_data.csv"</span>)
-
-<span class="hljs-comment"># Plot the bar chart</span>
-plt &lt;- ggplot(data, aes(x = location, y = total_cases)) +
-  geom_bar(stat = <span class="hljs-string">"identity"</span>, fill = <span class="hljs-string">"blue"</span>) +
-  labs(title = <span class="hljs-string">"COVID-19 Total Cases by Country"</span>,
-       x = <span class="hljs-string">"Country"</span>,
-       y = <span class="hljs-string">"Total Cases"</span>) +
-  theme(axis.text.x = element_text(angle = <span class="hljs-number">45</span>, hjust = <span class="hljs-number">1</span>))
-
-<span class="hljs-comment"># Show the bar chart</span>
-print(plt)
-</code></pre>
 <h2 class="code-line" data-line-start="99" data-line-end="100"><a id="4_Visualization_3_COVID19_Total_Deaths_vs_Total_Cases_99"></a>4. Visualization 3: COVID-19 Total Deaths vs Total Cases</h2>
 <h3 class="code-line" data-line-start="101" data-line-end="102"><a id="41_Overview_and_Result_101"></a>4.1 Overview and Result</h3>
 <p class="has-line-data" data-line-start="102" data-line-end="104">This visualization showcases a scatterplot with a linear regression line, representing the relationship between the total number of COVID-19 deaths and total cases for different countries. The scatterplot helps identify any correlation between these two variables…<br>
 <img src="https://i.imgur.com/F4k2Sv9.png" alt="Imgur"></p>
-<h3 class="code-line" data-line-start="104" data-line-end="105"><a id="42_Code_Snippet_104"></a>4.2 Code Snippet</h3>
-<pre><code class="has-line-data" data-line-start="106" data-line-end="120" class="language-R"><span class="hljs-keyword">library</span>(ggplot2)
-
-<span class="hljs-comment"># Read the country_data.csv file</span>
-data &lt;- read.csv(<span class="hljs-string">"country_data.csv"</span>)
-
-<span class="hljs-comment"># Plot the scatterplot with a linear regression line</span>
-scatterplot &lt;- ggplot(data, aes(x = total_cases, y = total_deaths)) +
-  geom_point(color = <span class="hljs-string">"black"</span>) +
-  geom_smooth(method = <span class="hljs-string">"lm"</span>, color = <span class="hljs-string">"blue"</span>) +
-  labs(title = <span class="hljs-string">"COVID-19 Total Deaths vs Total Cases"</span>)
-
-<span class="hljs-comment"># Show the scatterplot</span>
-print(scatterplot)
-</code></pre>
 <h2 class="code-line" data-line-start="121" data-line-end="122"><a id="5_Visualization_4_COVID19_Total_Cases_Over_Time_121"></a>5. Visualization 4: COVID-19 Total Cases Over Time</h2>
 <h3 class="code-line" data-line-start="123" data-line-end="124"><a id="51_Overview_and_Result_123"></a>5.1 Overview and Result</h3>
 <p class="has-line-data" data-line-start="124" data-line-end="126">This visualization represents the total number of COVID-19 cases over time using a time-series line chart. The chart provides an understanding of how the total cases have evolved and trended across a specific period.<br>
 <img src="https://i.imgur.com/6JKW7WZ.png" alt="Imgur"></p>
-<h3 class="code-line" data-line-start="126" data-line-end="127"><a id="52_Code_Snippet_126"></a>5.2 Code Snippet</h3>
-<pre><code class="has-line-data" data-line-start="128" data-line-end="153" class="language-R"><span class="hljs-keyword">library</span>(ggplot2)
-<span class="hljs-keyword">library</span>(scales)
-
-<span class="hljs-comment"># Read the country_data.csv file</span>
-data &lt;- read.csv(<span class="hljs-string">"country_data.csv"</span>)
-
-<span class="hljs-comment"># Perform data preprocessing and filtering</span>
-<span class="hljs-comment"># Add your data preprocessing and filtering steps here</span>
-
-<span class="hljs-comment"># Convert the date column to date format</span>
-data$date &lt;- as.Date(data$date)
-
-<span class="hljs-comment"># Plot the time-series chart</span>
-plt &lt;- ggplot(data, aes(x = date, y = total_cases)) +
-  geom_line(color = <span class="hljs-string">"blue"</span>) +
-  labs(title = <span class="hljs-string">"COVID-19 Total Cases Over Time"</span>,
-       x = <span class="hljs-string">"Date"</span>,
-       y = <span class="hljs-string">"Total Cases"</span>) +
-  theme(axis.text.x = element_text(angle = <span class="hljs-number">45</span>, hjust = <span class="hljs-number">1</span>)) +
-  scale_x_date(date_labels = <span class="hljs-string">"%b %Y"</span>, date_breaks = <span class="hljs-string">"1 month"</span>) +
-  scale_y_continuous(labels = comma)
-
-<span class="hljs-comment"># Show the time-series chart</span>
-print(plt)
-</code></pre>
 <h2 class="code-line" data-line-start="153" data-line-end="154"><a id="6_Visualization_5_Time_Series_Chart_of_COVID19_Total_Cases_by_Country_153"></a>6. Visualization 5: Time Series Chart of COVID-19 Total Cases by Country</h2>
 <h3 class="code-line" data-line-start="155" data-line-end="156"><a id="61_Overview_and_Result_155"></a>6.1 Overview and Result</h3>
 <p class="has-line-data" data-line-start="156" data-line-end="157">This visualization presents time series charts of COVID-19 total cases for each country individually. It allows for a comprehensive view of the trends and patterns in total cases over time for different countries.</p>
@@ -165,39 +89,7 @@ print(plt)
 </tr>
 </tbody>
 </table>
-<h3 class="code-line" data-line-start="167" data-line-end="168"><a id="62_Code_Snippet_167"></a>6.2 Code Snippet</h3>
-<pre><code class="has-line-data" data-line-start="169" data-line-end="201" class="language-R"><span class="hljs-keyword">library</span>(ggplot2)
-<span class="hljs-keyword">library</span>(scales)
-
-<span class="hljs-comment"># Read the country_data.csv file</span>
-data &lt;- read.csv(<span class="hljs-string">"country_data.csv"</span>)
-
-<span class="hljs-comment"># Get the unique list of countries</span>
-countries &lt;- unique(data$location)
-print(countries)
-
-<span class="hljs-comment"># Iterate over each country and plot the time series chart</span>
-<span class="hljs-keyword">for</span> (country <span class="hljs-keyword">in</span> countries) {
-  <span class="hljs-comment"># Filter the data for the current country</span>
-  filtered_data &lt;- data[data$location == country, ]
-  
-  <span class="hljs-comment"># Convert the date column to date format</span>
-  filtered_data$date &lt;- as.Date(filtered_data$date)
-  
-  <span class="hljs-comment"># Plot the time series chart</span>
-  plt &lt;- ggplot(filtered_data, aes(x = date, y = total_cases)) +
-    geom_line(color = <span class="hljs-string">"blue"</span>) +
-    labs(title = paste(<span class="hljs-string">"Time Series Chart of COVID-19 Total Cases in"</span>, country),
-         x = <span class="hljs-string">"Date"</span>,
-         y = <span class="hljs-string">"Total Cases"</span>) +
-    theme(axis.text.x = element_text(angle = <span class="hljs-number">45</span>, hjust = <span class="hljs-number">1</span>)) +
-    scale_x_date(date_labels = <span class="hljs-string">"%b %Y"</span>, date_breaks = <span class="hljs-string">"1 month"</span>) +
-    scale_y_continuous(labels = comma)
-  
-  <span class="hljs-comment"># Show the time series chart</span>
-  print(plt)
-}
-</code></pre>
 <h2 class="code-line" data-line-start="201" data-line-end="202"><a id="7_Conclusion_201"></a>7. Conclusion</h2>
 <p class="has-line-data" data-line-start="202" data-line-end="203">In this report, we analyzed the COVID-19 pandemic situation in Ireland and nine other countries. Through visualizations, we explored the regions affected by the virus on a world map, compared the total cases across countries, examined the relationship between total deaths and total cases, and observed the trends in total cases over time. These visualizations provide valuable insights into the COVID-19 pandemic and contribute to a better understanding of its impact worldwide.</p>
-</body></html>
+</body>
+</html>
